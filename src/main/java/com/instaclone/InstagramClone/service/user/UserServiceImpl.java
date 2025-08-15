@@ -201,6 +201,8 @@ public class UserServiceImpl implements UserService {
         dto.setBio(user.getBio());
         dto.setCreatedAt(user.getCreatedDate());
         dto.setPostCount(user.getPostCount());
+        dto.setFollowerCount(user.getFollowerCount());
+        dto.setFollowingCount(user.getFollowingCount());
 
         if (user.getProfilePicture() != null && user.getProfilePicture().length > 0) {
             String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -228,4 +230,90 @@ public class UserServiceImpl implements UserService {
         }
         return summaryDto;
     }
+    
+    @Override
+    @Transactional
+    public UserProfileDto followUser(String followerUsername, String followedUsername) {
+    	User followingUser = userRepository.findByUsername(followerUsername).orElseThrow(
+    			() -> new ResourceNotFoundException("User wanted to follow could not found!")
+    	);
+    	User followedUser = userRepository.findByUsername(followedUsername).orElseThrow(
+    			() -> new ResourceNotFoundException("User to follow could not found!")
+    	);
+    	
+    	if(followingUser.getUsername().equals(followedUser.getUsername())) {
+    		throw new RuntimeException("You cannot follow yourself!");
+    	}
+    	
+    	// User that follow others
+    	followingUser.getFollowing().add(followedUser);
+    	followingUser.setFollowingCount(followingUser.getFollowingCount() + 1);
+    	
+    	// User that followed by others
+    	followedUser.getFollowers().add(followingUser);
+    	followedUser.setFollowerCount(followedUser.getFollowerCount() + 1);
+    	
+    	userRepository.save(followingUser);
+    	userRepository.save(followedUser);
+    	
+    	return convertToUserProfileDto(followingUser);
+    }
+    
+    @Override
+    @Transactional
+    public UserProfileDto unfollowUser(String followerUsername, String followedUsername) {
+    	User followingUser = userRepository.findByUsername(followerUsername).orElseThrow(
+    			() -> new ResourceNotFoundException("User wanted to follow could not found!")
+    	);
+    	User followedUser = userRepository.findByUsername(followedUsername).orElseThrow(
+    			() -> new ResourceNotFoundException("User to follow could not found!")
+    	);
+    	
+    	if(followingUser.getUsername().equals(followedUser.getUsername())) {
+    		throw new RuntimeException("You cannot unfollow yourself!");
+    	}
+    	
+    	// User that follow others
+    	followingUser.getFollowing().remove(followedUser);
+    	followingUser.setFollowingCount(Math.max(0, followingUser.getFollowingCount() - 1));
+    	
+    	// User that followed by others
+    	followedUser.getFollowers().remove(followedUser);
+    	followedUser.setFollowerCount(Math.max(0, followedUser.getFollowingCount() - 1));
+    	
+    	userRepository.save(followingUser);
+    	userRepository.save(followedUser);
+    	
+    	return convertToUserProfileDto(followingUser);
+    }
+
+	@Override
+	public Page<UserSummaryDto> findFollowersByUsername(String currentUsername, Pageable pageable) {
+		Page<User> followers = userRepository.findFollowersByUsername(currentUsername, pageable);
+		Page<UserSummaryDto> followersDto;
+		
+		if(!followers.isEmpty()) {
+			followersDto = followers.map(this::convertToUserSummaryDto);
+		}
+		else {
+			throw new ResourceNotFoundException("Followers not found!");
+		}
+		
+		return followersDto;
+	}
+
+	@Override
+	public Page<UserSummaryDto> findFollowingsByUsername(String currentUsername, Pageable pageable) {
+		Page<User> followings = userRepository.findFollowingsByUsername(currentUsername, pageable);
+		Page<UserSummaryDto> followingsDto;
+		
+		if(!followings.isEmpty()) {
+			followingsDto = followings.map(this::convertToUserSummaryDto);
+		}
+		else {
+			throw new ResourceNotFoundException("Followings not found!");
+		}
+		
+		return followingsDto;
+	}
 }
