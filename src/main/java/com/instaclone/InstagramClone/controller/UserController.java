@@ -1,5 +1,7 @@
 package com.instaclone.InstagramClone.controller;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +25,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.instaclone.InstagramClone.dto.user.UserProfileDto;
+import com.instaclone.InstagramClone.dto.user.UserSummaryDto;
 import com.instaclone.InstagramClone.dto.user.UserUpdateRequestDto;
+import com.instaclone.InstagramClone.entity.User;
+import com.instaclone.InstagramClone.exception.ResourceNotFoundException;
 import com.instaclone.InstagramClone.service.user.UserService;
 
 import jakarta.validation.Valid;
@@ -99,4 +105,53 @@ public class UserController {
         
         return ResponseEntity.ok(userProfiles);
     }
+    
+    @PostMapping("/{username}/follow")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserProfileDto> followUser(
+    		Authentication authentication,
+    		@RequestParam String followingUsername
+    ) {
+    	String currentUsername = authentication.getName();
+    	UserProfileDto userDto = userService.followUser(currentUsername, followingUsername);
+    	
+    	return ResponseEntity.ok(userDto);
+    }
+    
+    @DeleteMapping("/{username}/follow")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserProfileDto> unfollowUser(
+    		Authentication authentication,
+    		@RequestParam String followingUsername
+    ) {
+    	String currentUsername = authentication.getName();
+    	UserProfileDto userDto = userService.unfollowUser(currentUsername, followingUsername);
+    	
+    	return ResponseEntity.ok(userDto);
+    }
+    
+    @GetMapping("/{username}/followers")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<UserSummaryDto>> getAllFollowers(
+    		Authentication authentication,
+    		Pageable page
+    ) {
+    	String currentUsername = authentication.getName();
+    	Page<UserSummaryDto> userFollowers = userService.findFollowersByUsername(currentUsername, page);
+    	
+    	return ResponseEntity.ok(userFollowers);
+    }
+    
+    @GetMapping("/{username}/followings")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Page<UserSummaryDto>> getAllFollowings(
+    		Authentication authentication,
+    		Pageable page
+    ) {
+    	String currentUsername = authentication.getName();
+    	Page<UserSummaryDto> userFollowings = userService.findFollowingsByUsername(currentUsername, page);
+    	
+    	return ResponseEntity.ok(userFollowings);
+    }
+    
 }
