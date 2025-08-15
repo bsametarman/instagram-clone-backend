@@ -12,6 +12,8 @@ public class UserProfileDto {
     private LocalDateTime createdAt;
     private boolean isActive;
     private int postCount;
+    private int followerCount;
+    private int followingCount;
 
     // Constructors
     public UserProfileDto() {
@@ -53,6 +55,14 @@ public class UserProfileDto {
     public int getPostCount() {
         return postCount;
     }
+    
+    public int getFollowerCount() {
+    	return followerCount;
+    }
+    
+    public int getFollowingCount() {
+    	return followingCount;
+    }
 
     // Setters
     public void setId(Long id) {
@@ -90,4 +100,13 @@ public class UserProfileDto {
     public void setPostCount(int postCount) {
         this.postCount = postCount;
     }
+    
+    public void setFollowerCount(int followerCount) {
+    	this.followerCount = followerCount;
+    }
+    
+    public void setFollowingCount(int followingCount) {
+    	this.followingCount = followingCount;
+    }
+    
 }
