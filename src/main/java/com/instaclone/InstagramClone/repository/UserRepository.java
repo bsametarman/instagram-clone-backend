@@ -23,5 +23,9 @@ public interface UserRepository extends JpaRepository<User, Long>{
             "LOWER(u.username) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(u.firstName) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(u.lastName) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-     Page<User> findBySearchTermAndIsActive(@Param("searchTerm") String searchTerm, Pageable pageable, boolean isActive);
+    Page<User> findBySearchTermAndIsActive(@Param("searchTerm") String searchTerm, Pageable pageable, boolean isActive);
+    @Query("SELECT f FROM User u JOIN u.followers f WHERE u.username = :username")
+    Page<User> findFollowersByUsername(@Param("username") String username, Pageable pageable);
+    @Query("SELECT f FROM User u JOIN u.following f WHERE u.username = :username")
+    Page<User> findFollowingsByUsername(@Param("username") String username, Pageable pageable);
 }
