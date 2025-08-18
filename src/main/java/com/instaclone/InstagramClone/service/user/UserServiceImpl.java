@@ -245,6 +245,10 @@ public class UserServiceImpl implements UserService {
     		throw new RuntimeException("You cannot follow yourself!");
     	}
     	
+    	if(followedUser.getFollowers().contains(followingUser)) {
+    		throw new RuntimeException("You have already followed this user!");
+    	}
+    	
     	// User that follow others
     	followingUser.getFollowing().add(followedUser);
     	followingUser.setFollowingCount(followingUser.getFollowingCount() + 1);
@@ -271,6 +275,10 @@ public class UserServiceImpl implements UserService {
     	
     	if(followingUser.getUsername().equals(followedUser.getUsername())) {
     		throw new RuntimeException("You cannot unfollow yourself!");
+    	}
+    	
+    	if(!followingUser.getFollowing().contains(followedUser)) {
+    		throw new RuntimeException("You have already don't follow this user!");
     	}
     	
     	// User that follow others
