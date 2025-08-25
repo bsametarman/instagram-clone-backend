@@ -95,7 +95,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or isAuthenticated()")
     public ResponseEntity<Page<UserProfileDto>> getAllActiveUsers(
     		@RequestParam(required = false) String searchTerm,
-            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC)
+            @PageableDefault(size = 12, sort = "createdDate", direction = Sort.Direction.DESC)
             Pageable pageable) {
         Page<UserProfileDto> userProfiles = userService.getAllActiveUsers(pageable, searchTerm, true);
         
