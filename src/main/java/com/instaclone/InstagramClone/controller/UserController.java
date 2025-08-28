@@ -148,4 +148,16 @@ public class UserController {
     	return ResponseEntity.ok(userFollowings);
     }
     
+    @GetMapping("/{username}/is-following")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Boolean> getIsFollowedByUser(
+    		Authentication authentication,
+    		@PathVariable String username
+    ) {
+    	String currentUsername = authentication.getName();
+    	Boolean isFollowed = userService.isFollowedByUser(currentUsername, username);
+    	
+    	return ResponseEntity.ok(isFollowed);
+    }
+    
 }
