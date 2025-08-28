@@ -324,4 +324,15 @@ public class UserServiceImpl implements UserService {
 		
 		return followingsDto;
 	}
+	
+	@Override
+	public Boolean isFollowedByUser(String currentUsername, String username) {
+		User currentUser = userRepository.findByUsername(currentUsername).orElseThrow(() -> new ResourceNotFoundException("User could not found!"));
+		User userToFollow = userRepository.findByUsername(username).orElseThrow(() -> new ResourceNotFoundException("User could not found!"));
+		
+		if(currentUser.getFollowing().contains(userToFollow))
+			return true;
+		else
+			return false;
+	}
 }

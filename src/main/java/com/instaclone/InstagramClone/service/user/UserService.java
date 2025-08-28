@@ -22,4 +22,5 @@ public interface UserService {
     UserProfileDto unfollowUser(String followerUsername, String followingUsername);
     Page<UserSummaryDto> findFollowersByUsername(String currentUsername, Pageable pageable);
     Page<UserSummaryDto> findFollowingsByUsername(String currentUSername, Pageable pageable);
+    Boolean isFollowedByUser(String currentUsername, String username);
 }
