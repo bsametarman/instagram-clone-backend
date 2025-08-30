@@ -215,6 +215,17 @@ public class PostServiceImpl implements PostService {
         }
         return fileStorageService.loadFileAsResource(videoIdentifier, VIDEO_SUB_DIRECTORY);
     }
+    
+    @Override
+	public Page<PostResponseDto> getMainPageFeed(String currentUsername, Pageable page) {
+		User currentUser = userRepository.findByUsername(currentUsername).orElseThrow(() -> new ResourceNotFoundException("User could not found!"));
+		
+		List<Long> followingsUserIds = currentUser.getFollowing().stream().map(User::getId).collect(Collectors.toList());
+		
+		Page<Post> followingsPosts = postRepository.findByUser_IdInOrderByCreatedAtDesc(followingsUserIds, page);
+		
+		return followingsPosts.map(post -> convertToPostResponseDto(post, currentUsername));
+	}
 
 
     private PostResponseDto convertToPostResponseDto(Post post, String currentUsername) {
@@ -282,4 +293,5 @@ public class PostServiceImpl implements PostService {
         }
         return dto;
     }
+
 }

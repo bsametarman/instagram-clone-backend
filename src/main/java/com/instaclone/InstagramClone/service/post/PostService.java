@@ -20,7 +20,7 @@ public interface PostService {
     void deletePost(Long postId, String username);
     Page<PostResponseDto> getUserPosts(String username, MediaType mediaType, String searchTerm, Pageable pageable, String currentUsername);
     //Page<PostResponseDto> getAllPosts(String searchTerm, Pageable pageable, String currentUsername);
-
+    Page<PostResponseDto> getMainPageFeed(String currentUsername, Pageable page);
     
     byte[] getPostImageContent(Long postId);
     Resource getVideoContent(String videoIdentifier);
