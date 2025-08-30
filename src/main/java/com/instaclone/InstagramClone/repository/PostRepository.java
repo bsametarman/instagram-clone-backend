@@ -41,5 +41,6 @@ public interface PostRepository extends JpaRepository<Post, Long>{
             "LOWER(p.title) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
             "LOWER(h.name) LIKE LOWER(CONCAT('%', :searchTerm, '%'))")
-     Page<Post> findAllBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageable);
+    Page<Post> findAllBySearchTerm(@Param("searchTerm") String searchTerm, Pageable pageable);
+    Page<Post> findByUser_IdInOrderByCreatedAtDesc(List<Long> userIds, Pageable page);
 }
