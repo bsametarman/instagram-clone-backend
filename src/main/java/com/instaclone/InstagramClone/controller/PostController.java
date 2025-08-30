@@ -98,6 +98,21 @@ public class PostController {
         
         return ResponseEntity.ok(responseDto);
     }
+    
+    @GetMapping("/main")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<PagedResponseDto<PostResponseDto>> getMainPageFeed(
+            @PageableDefault(size = 12, sort = "createdAt", direction = Sort.Direction.DESC)
+            Pageable pageable,
+            Authentication authentication) {
+        String currentUsername = (authentication != null) ? authentication.getName() : null;
+        
+        Page<PostResponseDto> mainPageFeed = postService.getMainPageFeed(currentUsername, pageable);
+        
+        PagedResponseDto<PostResponseDto> responseDto = new PagedResponseDto<>(mainPageFeed);
+        
+        return ResponseEntity.ok(responseDto);
+    }
 
     @DeleteMapping("/{postId}")
     @PreAuthorize("isAuthenticated()")
